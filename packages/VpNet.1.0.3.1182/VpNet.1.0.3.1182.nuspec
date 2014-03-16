@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>VpNet</id>
-    <version>1.0.3.1160</version>
+    <version>1.0.3.1182</version>
     <title>Virtual Paradise .NET SDK</title>
     <authors>Sjef van Leeuwen, Edwin Rijkee</authors>
     <owners>Sjef van Leeuwen, Edwin Rijkee</owners>
@@ -10,13 +10,12 @@
     <projectUrl>http://vpnet.codeplex.com/</projectUrl>
     <iconUrl>http://vpnet.virtualparadise.org/images/nugetlogovp.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>This SDK wraps C libraries for the win/linux/mac platform to a x86 .NET 4.0 framework. It provides a managed abstraction layer to write so called "bots" for the Virtual Paradise 3D Virtual Reality Environment (see: http://virtualparadise.org).
+    <description>This SDK wraps C libraries for the win/linux/mac platform to a x86/x64 .NET 4.0 framework. It provides a managed abstraction layer to write so called "bots" for the Virtual Paradise 3D Virtual Reality Environment (see: http://virtualparadise.org).
 
 These bots can interact with the user, their chats and 3D objects in the world.
 
 Ultimately it allows you to create rich media networked applications such as 3D VR Games directly from the .NET (mono) framework.</description>
     <summary>Virtual Paradise is an online virtual universe consisting of several 3D worlds. In each world you can chat with others, create your own buildings and explore the environments built by other users.</summary>
-    <releaseNotes />
     <copyright>2012-2014</copyright>
     <language>en-US</language>
     <frameworkAssemblies>

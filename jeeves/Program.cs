@@ -11,6 +11,11 @@ namespace jeeves
     public static class storage
     {
         public static List<Player> stats = new List<Player>();
+        public static string desc;
+        public static string clicker;
+        public static int p;
+        public static int i;
+
     }
 
 
@@ -23,7 +28,7 @@ namespace jeeves
 
             var vp = new Instance();
             vp.Connect();
-            vp.Login("trooper", "", "jeeves");
+            vp.Login("trooper", "wiggle11", "jeeves");
             vp.Enter("Blizzard");
             Console.WriteLine("online");
             vp.UpdateAvatar();
@@ -31,6 +36,8 @@ namespace jeeves
             vp.OnAvatarEnter += vp_OnAvatarEnter;
             vp.OnAvatarChange += vp_OnAvatarChange;
             vp.OnChatMessage += vp_OnChatMessage;
+            vp.OnObjectClick += vp_OnObjectClick;
+            vp.OnObjectGetCallback += vp_OnObjectGetCallback;
 
 
 
@@ -71,7 +78,19 @@ namespace jeeves
                     Console.WriteLine("\nCapacity: {0}", storage.stats.Capacity);
                     Console.WriteLine("Count: {0}", storage.stats.Count);
                 }
+                else if (line == "stats list")
+                {
+                    for (int c = 0; c < storage.stats.Count; c++) // Loop through List with for id of person
+                    {
+                        Console.WriteLine(storage.stats[c]._name);
+                        Console.WriteLine(storage.stats[c]._wep);
+                        Console.WriteLine(storage.stats[c]._health);
+                        Console.WriteLine(storage.stats[c]._armor);
+                        Console.WriteLine(storage.stats[c]._ammo);
+                        Console.WriteLine(storage.stats[c]._grenadeammo);
+                    }
 
+                }
 
                 else
                 {
@@ -80,109 +99,162 @@ namespace jeeves
                     Console.WriteLine(" characters and i didnt understand one");
                 }
             }
+        }
 
 
+        static void vp_OnObjectGetCallback(Instance sender, ObjectGetCallbackArgsT<RcDefault, VpObject<Vector3>, Vector3> args)
+        {
+            Console.WriteLine(args.VpObject.Description);
+            storage.desc = args.VpObject.Description;
+            //Console.WriteLine(args.VpObject.Action);
+
+
+
+            for (int b = 0; b < storage.stats.Count; b++) // Loop through List with for id of person
+            {
+                if (storage.clicker == storage.stats[b]._name)
+                {
+                    if (storage.desc == "knife")
+                    {
+                        storage.stats[b]._wep = "knife";
+                        Console.WriteLine("{0} was given {1}", storage.clicker, storage.stats[b]._wep);
+                    }
+                    else if (storage.desc == "rocket launcher")
+                    {
+                        storage.stats[b]._wep = "rocketlauncher";
+                        Console.WriteLine("{0} was given {1}", storage.clicker, storage.stats[b]._wep);
+                    }
+                    else if (storage.desc == "sniper")
+                    {
+                        storage.stats[b]._wep = "sniper";
+                        Console.WriteLine("{0} was given {1}", storage.clicker, storage.stats[b]._wep);
+                    }
+                    else if (storage.desc == "handgun")
+                    {
+                        storage.stats[b]._wep = "handgun";
+                        Console.WriteLine("{0} was given {1}", storage.clicker, storage.stats[b]._wep);
+                    }
+                    else if (storage.desc == "grenade")
+                    {
+                        storage.stats[b]._wep = "grenade";
+                        Console.WriteLine("{0} was given {1}", storage.clicker, storage.stats[b]._wep);
+                    }
+                    else if (storage.desc == "ammo")
+                    {
+                        storage.stats[b]._ammo = 6;
+                        Console.WriteLine("{0} was given {1} ammo", storage.clicker, storage.stats[b]._ammo);
+                    }
+                    else if (storage.desc == "armor")
+                    {
+                        storage.stats[b]._armor = 5;
+                        Console.WriteLine("{0} was given armor at level {1}", storage.clicker, storage.stats[b]._ammo);
+
+                    }
+                }
+            }
+        }
+        static void vp_OnObjectClick(Instance sender, ObjectClickArgsT<Avatar<Vector3>, VpObject<Vector3>, Vector3> args)
+        {
+
+            Console.WriteLine("{0},{1}", args.Avatar.Name, args.VpObject.Id);
+            sender.GetObject(args.VpObject.Id);
+            storage.clicker = args.Avatar.Name;
 
 
 
         }
-
         static void vp_OnAvatarClick(Instance sender, AvatarClickEventArgsT<Avatar<Vector3>, Vector3> args)
         {
 
-             var distance = Vector3.Distance(args.Avatar.Position, args.ClickedAvatar.Position);
-             Console.WriteLine(distance);
-            
-            
+            var distance = Vector3.Distance(args.Avatar.Position, args.ClickedAvatar.Position); //calculate distnace between clicked and clickee
+
+            // creates a grenade which you can throw 20 meters, and has a damage radius of 5 meters. with a falloff of 100% in the radius and a max damage of 100 points.
+            var grenade = new DamageCalculation.Weapon("Grenade", 0.5f, 20, 10, 2f); //grenade,damage radious,0,dammagem,distance
+
+
+            Console.WriteLine(distance);
+
+
             //storage.stats.Find(x => x._name.Contains("seat")));
             //storage.stats.Find(x => x._name == args.ClickedAvatar.Name); 
             for (int i = 0; i < storage.stats.Count; i++) // Loop through List with for
             {
-                if (args.ClickedAvatar.Name == storage.stats[i]._name)
+                if (args.Avatar.Name == storage.stats[i]._name)
                 {
-                    if (storage.stats[i]._wep == "knife" && distance <= .5)
+                    for (int p = 0; p < storage.stats.Count; p++) // Loop through List with for
                     {
-                        Console.WriteLine("knifed");
-                        sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("knifed {0}", args.ClickedAvatar.Name));
-                        storage.stats[i]._health = storage.stats[i]._health - 5;
-
-                        //sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("{0} was stabbed by {1}", args.ClickedAvatar.Name, args.Avatar.Name)); //saw you saw trooper
-
+                        if (args.ClickedAvatar.Name == storage.stats[p]._name)
+                        {
+                            if (storage.stats[i]._wep == "knife" && distance <= .5)
+                            {
+                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                            }
+                            else if (storage.stats[i]._wep == "handgun" && distance <= 5)
+                            {
+                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
+                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                            }
+                            else if (storage.stats[i]._wep == "sniper" && distance <= 30)
+                            {
+                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
+                                storage.stats[p]._health = storage.stats[p]._health - 10;
+                            }
+                            else if (storage.stats[i]._wep == "rocketlauncher" && distance <= 10)
+                            {
+                                //need help with splash code HELP!
+                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
+                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                // splash code
+                            }
+                            else if (storage.stats[i]._wep == "grenade")
+                            {
+                                // = Throw(grenade, avatars[0], avatars[3], 80, avatars);
+                                //  var damage2 = DamageCalculation.Throw(grenade, args.Avatar.Name  , args.ClickedAvatar.Name, 80, storage.stats);
+                                storage.stats[i]._ammo = storage.stats[i]._grenadeammo - 1;
+                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                // splash code
+                            }
+                            else
+                            {
+                                Console.WriteLine("failed");
+                            }
+                            // code for what happend
+                            sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[i]._wep, args.Avatar.Name, storage.stats[i]._health - 10));//say you were stabbed directly to victim
+                            sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("I stabbed {0} he has {1} life left", args.ClickedAvatar.Name, storage.stats[p]._health - 10));//say you stabed viciton
+                            Console.WriteLine("{0} stabed {1} health left {2}", args.Avatar.Name, args.ClickedAvatar.Name, storage.stats[p]._health - 10);
+                        }
                     }
 
-                    else if (storage.stats[i]._wep == "handgun" && distance <= 5)
-                    {
-                        storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                        storage.stats[i]._health = storage.stats[i]._health - 5;
-                        //sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("{0} was shot by {1}", args.ClickedAvatar.Name, args.Avatar.Name)); //saw you saw trooper
-
-                    }
-
-                    else if (storage.stats[i]._wep == "sniper" && distance <= 15)
-                    {
-                        storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                        storage.stats[i]._health = storage.stats[i]._health - 5;
-                        //sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("{0} was sniped by {1}", args.ClickedAvatar.Name, args.Avatar.Name)); //saw you saw trooper
-
-                    }
-
-                    else if (storage.stats[i]._wep == "rocketlauncher" && distance <= 10)
+                    if (storage.stats[storage.p]._health <= 10) //if dead clause
                     {
 
-                        //need help with splash code HELP!
+                        args.ClickedAvatar.Position = new Vector3(0, 1, 0);
+                        args.ClickedAvatar.Rotation = new Vector3(0, 0, 0);
+                        sender.TeleportAvatar(args.ClickedAvatar);
 
-                        storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                        storage.stats[i]._health = storage.stats[i]._health - 5;
+                        sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[i]._wep, args.Avatar.Name, storage.stats[i]._health - 10));//say you were stabbed directly to victim
+                        Console.WriteLine("{0} died with health of {1}", args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10);
 
-                        // splash code
-                        //sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("{0} was blownup by {1}", args.ClickedAvatar.Name, args.Avatar.Name)); //saw you saw trooper
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("failed");
+                        storage.stats[storage.p]._health = 20;
+                        storage.stats[storage.p]._armor = 0;
+                        storage.stats[storage.p]._wep = "knife";
+                        storage.stats[storage.p]._ammo = 6;
+                        // code for when you die
                     }
                 }
-                
-
-
-
-
-                if (storage.stats[i]._health <= 10) //if dead clause
-                {
-
-                    args.ClickedAvatar.Position = new Vector3(0, 1, 0);
-                    args.ClickedAvatar.Rotation = new Vector3(0, 0, 0);
-                    sender.TeleportAvatar(args.ClickedAvatar);
-                    storage.stats[i]._health = 20;
-                    storage.stats[i]._armor = 0;
-                    storage.stats[i]._wep = "knife";
-                    storage.stats[i]._ammo = 6;
-
-                    //sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("{0} was sent to hospital by {1}", args.ClickedAvatar.Name, args.Avatar.Name)); //saw you saw trooper
-                }
-
             }
-
-
         }
-
         static void vp_OnChatMessage(Instance sender, ChatMessageEventArgsT<Avatar<Vector3>, ChatMessage, Vector3, Color> args)
         {
             Console.WriteLine("{0} : {1}", args.ChatMessage.Name, args.ChatMessage.Message); //displays chat on console window
         }
-
-
         static void vp_OnAvatarChange(Instance sender, AvatarChangeEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-            
+
             if (args.Avatar.Name == "trooper")
             {
                 args.Avatar.Position = Vector3.UnitY + args.Avatar.Position; // follow trooper 1 meter above head
                 sender.UpdateAvatar(args.Avatar.Position); //change position to follow trooper
-
-
-                //Console.WriteLine("{0},{1}", args.Avatar.Name, args.Avatar.Position); //says where the avatar is and what its possition is
             }
         }
         static void vp_OnAvatarEnter(Instance sender, AvatarEnterEventArgsT<Avatar<Vector3>, Vector3> args)
@@ -198,8 +270,9 @@ namespace jeeves
             stats1._wep = "knife";
             stats1._armor = 1;
             stats1._ammo = 6;
+            stats1._grenadeammo = 0;
 
-            storage.stats.Add(new Player() { _health = stats1._health, _name = stats1._name,_wep = stats1._wep,_ammo = stats1._ammo,_armor = stats1._armor }); //makes container for each variable
+            storage.stats.Add(new Player() { _health = stats1._health, _name = stats1._name, _wep = stats1._wep, _ammo = stats1._ammo, _armor = stats1._armor, _grenadeammo = stats1._grenadeammo }); //makes container for each variable
 
             Console.WriteLine("done");
 

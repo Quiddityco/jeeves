@@ -21,6 +21,9 @@ namespace jeeves
 
         public int _ammo { get; set; } //ammo of user
 
-        public int _position { get; set; } //ammo of user
+        public int _grenadeammo { get; set; } //ammo of user
+
+      
+
     }
 }
