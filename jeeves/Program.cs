@@ -163,9 +163,13 @@ namespace jeeves
 
 
         }
+        
         static void vp_OnAvatarClick(Instance sender, AvatarClickEventArgsT<Avatar<Vector3>, Vector3> args)
         {
-
+            if (args.ClickedAvatar.Name == null)
+            {
+                Console.WriteLine("TEESSTTT");
+            }
             var distance = Vector3.Distance(args.Avatar.Position, args.ClickedAvatar.Position); //calculate distnace between clicked and clickee
 
             // creates a grenade which you can throw 20 meters, and has a damage radius of 5 meters. with a falloff of 100% in the radius and a max damage of 100 points.
@@ -177,69 +181,75 @@ namespace jeeves
 
             //storage.stats.Find(x => x._name.Contains("seat")));
             //storage.stats.Find(x => x._name == args.ClickedAvatar.Name); 
-            for (int i = 0; i < storage.stats.Count; i++) // Loop through List with for
+            for (storage.i = 0; storage.i < storage.stats.Count; storage.i++) // Loop through List with for
             {
-                if (args.Avatar.Name == storage.stats[i]._name)
+                if (args.Avatar.Name == storage.stats[storage.i]._name)
                 {
-                    for (int p = 0; p < storage.stats.Count; p++) // Loop through List with for
+                    for (storage.p = 0; storage.p < storage.stats.Count; storage.p++) // Loop through List with for
                     {
-                        if (args.ClickedAvatar.Name == storage.stats[p]._name)
+                        if (args.ClickedAvatar.Name == storage.stats[storage.p]._name)
                         {
-                            if (storage.stats[i]._wep == "knife" && distance <= .5)
+                            if (storage.stats[storage.i]._wep == "knife" && distance <= .5)
                             {
-                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                storage.stats[storage.p]._health = storage.stats[storage.p]._health - 5;
                             }
-                            else if (storage.stats[i]._wep == "handgun" && distance <= 5)
+                            else if (storage.stats[storage.i]._wep == "handgun" && distance <= 5)
                             {
-                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                storage.stats[storage.i]._ammo = storage.stats[storage.i]._ammo - 1;
+                                storage.stats[storage.p]._health = storage.stats[storage.p]._health - 5;
                             }
-                            else if (storage.stats[i]._wep == "sniper" && distance <= 30)
+                            else if (storage.stats[storage.i]._wep == "sniper" && distance <= 30)
                             {
-                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                                storage.stats[p]._health = storage.stats[p]._health - 10;
+                                storage.stats[storage.i]._ammo = storage.stats[storage.i]._ammo - 1;
+                                storage.stats[storage.p]._health = storage.stats[storage.p]._health - 10;
                             }
-                            else if (storage.stats[i]._wep == "rocketlauncher" && distance <= 10)
+                            else if (storage.stats[storage.i]._wep == "rocketlauncher" && distance <= 10)
                             {
                                 //need help with splash code HELP!
-                                storage.stats[i]._ammo = storage.stats[i]._ammo - 1;
-                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                storage.stats[storage.i]._ammo = storage.stats[storage.i]._ammo - 1;
+                                storage.stats[storage.p]._health = storage.stats[storage.p]._health - 5;
                                 // splash code
                             }
-                            else if (storage.stats[i]._wep == "grenade")
+                            else if (storage.stats[storage.i]._wep == "grenade")
                             {
                                 // = Throw(grenade, avatars[0], avatars[3], 80, avatars);
                                 //  var damage2 = DamageCalculation.Throw(grenade, args.Avatar.Name  , args.ClickedAvatar.Name, 80, storage.stats);
-                                storage.stats[i]._ammo = storage.stats[i]._grenadeammo - 1;
-                                storage.stats[p]._health = storage.stats[p]._health - 5;
+                                storage.stats[storage.i]._ammo = storage.stats[storage.i]._grenadeammo - 1;
+                                storage.stats[storage.p]._health = storage.stats[storage.p]._health - 5;
                                 // splash code
                             }
                             else
                             {
                                 Console.WriteLine("failed");
                             }
+
+
                             // code for what happend
-                            sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[i]._wep, args.Avatar.Name, storage.stats[i]._health - 10));//say you were stabbed directly to victim
-                            sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("I stabbed {0} he has {1} life left", args.ClickedAvatar.Name, storage.stats[p]._health - 10));//say you stabed viciton
-                            Console.WriteLine("{0} stabed {1} health left {2}", args.Avatar.Name, args.ClickedAvatar.Name, storage.stats[p]._health - 10);
+                            sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[storage.i]._wep, args.Avatar.Name, storage.stats[storage.i]._health - 10));//say you were stabbed directly to victim
+                            sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("you attacked with a {0} and hit {1} he has {2} life left",storage.stats[storage.i]._wep, args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10));//say you stabed viciton
+                            Console.WriteLine("{0} stabed {1} health left {2}", args.Avatar.Name, args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10);
+
+                            if (storage.stats[storage.p]._health <= 10) //if dead clause
+                            {
+
+                                args.ClickedAvatar.Position = new Vector3(0, 1, 0);
+                                args.ClickedAvatar.Rotation = new Vector3(0, 0, 0);
+                                sender.TeleportAvatar(args.ClickedAvatar);
+
+                                sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[storage.i]._wep, args.Avatar.Name, storage.stats[storage.i]._health - 10));//say you were stabbed directly to victim
+                                Console.WriteLine("{0} died with health of {1}", args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10);
+
+                                storage.stats[storage.p]._health = 20;
+                                storage.stats[storage.p]._armor = 0;
+                                storage.stats[storage.p]._wep = "knife";
+                                storage.stats[storage.p]._ammo = 6;
+                                // code for when you die
+                            }
+                        
+                        
                         }
-                    }
 
-                    if (storage.stats[storage.p]._health <= 10) //if dead clause
-                    {
 
-                        args.ClickedAvatar.Position = new Vector3(0, 1, 0);
-                        args.ClickedAvatar.Rotation = new Vector3(0, 0, 0);
-                        sender.TeleportAvatar(args.ClickedAvatar);
-
-                        sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[i]._wep, args.Avatar.Name, storage.stats[i]._health - 10));//say you were stabbed directly to victim
-                        Console.WriteLine("{0} died with health of {1}", args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10);
-
-                        storage.stats[storage.p]._health = 20;
-                        storage.stats[storage.p]._armor = 0;
-                        storage.stats[storage.p]._wep = "knife";
-                        storage.stats[storage.p]._ammo = 6;
-                        // code for when you die
                     }
                 }
             }
