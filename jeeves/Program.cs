@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using VpNet;
 
+
 namespace jeeves
 {
 
-    public static class storage
+    public static class storage //storage for all variable and list
     {
         public static List<Player> stats = new List<Player>();
         public static string desc;
@@ -23,14 +24,14 @@ namespace jeeves
     class Program
     {
 
-        static void Main(string[] args)
+        static void Main(string[] args) // main sequence
         {
 
             var vp = new Instance();
-            vp.Connect();
+            vp.Connect(); //connect to vp
             vp.Login("trooper", "wiggle11", "jeeves");
             vp.Enter("Blizzard");
-            Console.WriteLine("online");
+            Console.WriteLine("CONNECTED");
             vp.UpdateAvatar();
             vp.UseAutoWaitTimer = true;
             vp.OnAvatarEnter += vp_OnAvatarEnter;
@@ -38,6 +39,7 @@ namespace jeeves
             vp.OnChatMessage += vp_OnChatMessage;
             vp.OnObjectClick += vp_OnObjectClick;
             vp.OnObjectGetCallback += vp_OnObjectGetCallback;
+            vp.OnObjectChangeCallback += vp_OnObjectChangeCallback;
 
 
 
@@ -63,12 +65,12 @@ namespace jeeves
                     //feather out from trooper
 
                 }
-                else if (line.StartsWith("say"))
+                else if (line.StartsWith("say")) // bot chat command
                 {
                     vp.Say(line.Remove(0, 4));
                     Console.WriteLine(line);
                 }
-                else if (line == "start city")
+                else if (line == "start city") // starts the vp:gta code
                 {
                     vp.OnAvatarClick += vp_OnAvatarClick;
                     vp.Say("everyone has been given guns");
@@ -98,14 +100,22 @@ namespace jeeves
                     Console.Write(line.Length); // length of line
                     Console.WriteLine(" characters and i didnt understand one");
                 }
+
+                //vp.GetObject(1528956); 
+ 
             }
+        }
+
+        static void vp_OnObjectChangeCallback(Instance sender, ObjectChangeCallbackArgsT<RcDefault, VpObject<Vector3>, Vector3> args)
+        {
+            args.VpObject.Description = "boob";
         }
 
 
         static void vp_OnObjectGetCallback(Instance sender, ObjectGetCallbackArgsT<RcDefault, VpObject<Vector3>, Vector3> args)
         {
-            Console.WriteLine(args.VpObject.Description);
-            storage.desc = args.VpObject.Description;
+            Console.WriteLine(args.VpObject.Description);  // write description for object after the callback calls for the details
+            storage.desc = args.VpObject.Description; //store description in desc
             //Console.WriteLine(args.VpObject.Action);
 
 
@@ -168,7 +178,7 @@ namespace jeeves
         {
             if (args.ClickedAvatar.Name == null)
             {
-                Console.WriteLine("TEESSTTT");
+                Console.WriteLine("TEESSTTT"); // fix this so that avatarclick no longer causes exception
             }
             var distance = Vector3.Distance(args.Avatar.Position, args.ClickedAvatar.Position); //calculate distnace between clicked and clickee
 
@@ -181,11 +191,11 @@ namespace jeeves
 
             //storage.stats.Find(x => x._name.Contains("seat")));
             //storage.stats.Find(x => x._name == args.ClickedAvatar.Name); 
-            for (storage.i = 0; storage.i < storage.stats.Count; storage.i++) // Loop through List with for
+            for (storage.i = 0; storage.i < storage.stats.Count; storage.i++) // Loop through List with for the clicking avatar name
             {
                 if (args.Avatar.Name == storage.stats[storage.i]._name)
                 {
-                    for (storage.p = 0; storage.p < storage.stats.Count; storage.p++) // Loop through List with for
+                    for (storage.p = 0; storage.p < storage.stats.Count; storage.p++) // Loop through List with for clicked avatar name
                     {
                         if (args.ClickedAvatar.Name == storage.stats[storage.p]._name)
                         {
@@ -210,7 +220,7 @@ namespace jeeves
                                 storage.stats[storage.p]._health = storage.stats[storage.p]._health - 5;
                                 // splash code
                             }
-                            else if (storage.stats[storage.i]._wep == "grenade")
+                            else if (storage.stats[storage.i]._wep == "grenade") // needs work HELP!
                             {
                                 // = Throw(grenade, avatars[0], avatars[3], 80, avatars);
                                 //  var damage2 = DamageCalculation.Throw(grenade, args.Avatar.Name  , args.ClickedAvatar.Name, 80, storage.stats);
@@ -224,7 +234,7 @@ namespace jeeves
                             }
 
 
-                            // code for what happend
+                            // code for what happend displaying who clicked who and what clicked what
                             sender.ConsoleMessage(args.ClickedAvatar, "jeeves", string.Format("you were attacked with a {0} by {1} you have {2} life left ", storage.stats[storage.i]._wep, args.Avatar.Name, storage.stats[storage.i]._health - 10));//say you were stabbed directly to victim
                             sender.ConsoleMessage(args.Avatar, "jeeves", string.Format("you attacked with a {0} and hit {1} he has {2} life left",storage.stats[storage.i]._wep, args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10));//say you stabed viciton
                             Console.WriteLine("{0} stabed {1} health left {2}", args.Avatar.Name, args.ClickedAvatar.Name, storage.stats[storage.p]._health - 10);
@@ -242,14 +252,10 @@ namespace jeeves
                                 storage.stats[storage.p]._health = 20;
                                 storage.stats[storage.p]._armor = 0;
                                 storage.stats[storage.p]._wep = "knife";
-                                storage.stats[storage.p]._ammo = 6;
+                                storage.stats[storage.p]._ammo = 0;
                                 // code for when you die
                             }
-                        
-                        
                         }
-
-
                     }
                 }
             }
@@ -278,8 +284,8 @@ namespace jeeves
             stats1._name = args.Avatar.Name;
             stats1._health = 20;
             stats1._wep = "knife";
-            stats1._armor = 1;
-            stats1._ammo = 6;
+            stats1._armor = 0;
+            stats1._ammo = 0;
             stats1._grenadeammo = 0;
 
             storage.stats.Add(new Player() { _health = stats1._health, _name = stats1._name, _wep = stats1._wep, _ammo = stats1._ammo, _armor = stats1._armor, _grenadeammo = stats1._grenadeammo }); //makes container for each variable
